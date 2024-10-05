@@ -1,0 +1,1 @@
+# This folder will contain the google cloud functions used for our project
