@@ -15,8 +15,8 @@ gcloud functions deploy download-cdc-data \
     --runtime python311 \
     --trigger-http \
     --entry-point task \
-    --source ./extract-txt-and-transform\extract-txt \
-    --stage-bucket ba882-victorgf-stage-bucket \
+    --source ./extract-txt-and-transform/extract-txt \
+    --stage-bucket ba882-cloud-functions-stage \
     --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
     --region us-central1 \
     --allow-unauthenticated \
