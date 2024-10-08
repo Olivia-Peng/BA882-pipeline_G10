@@ -1,16 +1,17 @@
 import pandas as pd
-from google.cloud import storage, bigquery
+from google.cloud import storage
 import functions_framework
 import pyarrow
+import io
 
 # Google Cloud Function entry point
 @functions_framework.http
 def upload_txt_to_bigquery(request):
-    # Define project, bucket, and dataset information
+    # Define project and bucket information
     project_id = 'ba882-group-10'
     bucket_name = 'cdc-extract-txt'
-    dataset_id = "ba882-group-10.cdc_data"
-    table_id = f"{dataset_id}.cdc_occurrences"
+    output_bucket_name = 'cdc-extract-dataframe'
+    output_blob_name = 'cdc_data.parquet'
 
     # Initialize Google Cloud Storage client
     storage_client = storage.Client(project=project_id)
@@ -20,10 +21,10 @@ def upload_txt_to_bigquery(request):
     blobs = list(bucket.list_blobs())
     txt_blobs = [blob for blob in blobs if blob.name.endswith('.txt')]
 
-    # Initialize BigQuery client
-    bigquery_client = bigquery.Client(project=project_id)
+    # Collect data from all files
+    all_data = []
 
-    # Process each text file and upload to BigQuery
+    # Process each text file
     for blob in txt_blobs:
         print(f"Processing file: {blob.name}")
 
@@ -33,9 +34,13 @@ def upload_txt_to_bigquery(request):
 
         # Extract relevant information from the text
         disease_name = lines[4].split(";")[0].strip()  # Extracting disease name, e.g., Cryptosporidiosis
-        week_year = blob.name.split('_')[0] + " " + blob.name.split('_')[1]  # Extract Week_Year from filename
 
-        data = []
+        # Extract week and year from filename
+        parts = blob.name.split('_')
+        year = parts[0]
+        week = parts[1]
+        week_year = f"{year} {week}"
+        print(f"Parsed week_year: {week_year}")  # Debugging log
 
         # Start reading tab-delimited data from the appropriate line
         start_index = 7  # Data starts from line 7 in the provided file
@@ -54,20 +59,26 @@ def upload_txt_to_bigquery(request):
                 current_week_count = 0  # Set to 0 if the value is not a valid integer
 
             # Append the extracted data to the list
-            data.append({
+            all_data.append({
                 "Disease": disease_name,
                 "Region": region,
                 "Current_Week_Occurrence_Count": current_week_count,
                 "Week_Year": week_year
             })
 
-        # Convert list to DataFrame
-        df = pd.DataFrame(data)
+    # Convert list to DataFrame
+    df = pd.DataFrame(all_data)
 
-        # Load DataFrame into BigQuery
-        job = bigquery_client.load_table_from_dataframe(df, table_id, job_config=bigquery.LoadJobConfig())
-        job.result()  # Wait for the load job to complete
+    # Store DataFrame in Google Cloud Storage as a Parquet file
+    if not df.empty:
+        output_bucket = storage_client.bucket(output_bucket_name)
+        output_buffer = io.BytesIO()
+        df.to_parquet(output_buffer, index=False)
+        output_buffer.seek(0)  # Reset buffer position to the beginning
+        output_blob = output_bucket.blob(output_blob_name)
+        output_blob.upload_from_file(output_buffer, content_type='application/octet-stream')
+        print(f"Stored DataFrame to {output_bucket_name}/{output_blob_name}")
+    else:
+        print("No data to store.")
 
-        print(f"Uploaded data from {blob.name} to BigQuery table {table_id}")
-
-    return "Upload to BigQuery completed."
+    return "Data processing and storage completed."
