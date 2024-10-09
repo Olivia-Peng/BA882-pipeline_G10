@@ -39,17 +39,35 @@ gcloud functions deploy create-schema \
     --allow-unauthenticated \
     --memory 256MB
 
-# BigQuery upload function deployment
+# Transforming .txt files into tabular (dataframe data) and save as a parquet file
 echo "======================================================"
-echo "Deploying the BigQuery upload function"
+echo "Deploying the Transform Function"
 echo "======================================================"
 
-gcloud functions deploy upload-txt-to-bigquery \
+gcloud functions deploy transform_txt_to_dataframe \
     --gen2 \
     --runtime python311 \
     --trigger-http \
-    --entry-point upload_txt_to_bigquery \
-    --source ./extract-txt-and-transform/load \
+    --entry-point transform_txt_to_dataframe \
+    --source ./extract-txt-and-transform/transform \
+    --stage-bucket ba882-cloud-functions-stage \
+    --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --memory 512MB
+
+
+# Load Parquet data into BigQuery function deployment
+echo "======================================================"
+echo "Deploying the Load to BigQuery Function"
+echo "======================================================"
+
+gcloud functions deploy load-to-bigquery \
+    --gen2 \
+    --runtime python311 \
+    --trigger-http \
+    --entry-point load_to_bigquery \
+    --source ./extract-txt-and-transform/load-into-bigquery \
     --stage-bucket ba882-cloud-functions-stage \
     --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
     --region us-central1 \
