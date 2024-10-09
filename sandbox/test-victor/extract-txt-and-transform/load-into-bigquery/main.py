@@ -1,4 +1,5 @@
 import pandas as pd
+import pyarrow  # Import pyarrow to ensure Parquet file support
 from google.cloud import bigquery
 from google.cloud import storage
 import functions_framework
