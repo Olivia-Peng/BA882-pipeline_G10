@@ -34,10 +34,16 @@ def transform_txt_to_dataframe(job_id):
 
 # Task to call the new function that loads Parquet data into BigQuery in the raw table version
 @task(retries=2, retry_delay_seconds=60)
-def load_to_bigquery(job_id):
-    cloud_function_url = "https://us-central1-ba882-group-10.cloudfunctions.net/load-to-bigquery"
+def load_to_raw(job_id):
+    cloud_function_url = "https://us-central1-ba882-group-10.cloudfunctions.net/load-to-raw"
     invoke_gcf(cloud_function_url, payload={"job_id": job_id})
     print("Data loaded to BigQuery successfully.")
+
+@task(retries=2, retry_delay_seconds=60)
+def load_to_stage():
+    cloud_function_url = "https://us-central1-ba882-group-10.cloudfunctions.net/load_to_stage"
+    invoke_gcf(cloud_function_url, payload={})
+    print("Upsert from raw to staging table completed successfully!")
 
 # Define the combined flow
 @flow
@@ -52,7 +58,10 @@ def combined_pipeline_flow():
     transform_txt_to_dataframe(job_id)
 
     # Step 4: Load Parquet data into BigQuery
-    load_to_bigquery(job_id)
+    load_to_raw(job_id)
+
+    # Step 5: Upsert data from raw to staging table in Bigquery
+    load_to_stage()
 
 # Run the Prefect flow
 if __name__ == "__main__":
