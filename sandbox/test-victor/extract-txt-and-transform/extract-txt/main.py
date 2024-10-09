@@ -9,6 +9,7 @@ import os
 import functions_framework
 from retrying import retry
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
 
 # Define project and bucket information
 project_id = 'ba882-group-10'
@@ -39,7 +40,6 @@ def download_txt_file(year, week, disease_table, bucket_name):
 @functions_framework.http
 def task(request):
     # Respond immediately to acknowledge the request
-    from concurrent.futures import ThreadPoolExecutor
 
     def process():
         # Parameters for the function
@@ -56,7 +56,12 @@ def task(request):
                     weeks_range = range(1, 53)  # All weeks for 2023
 
                 for week in weeks_range:
-                    download_txt_file(year, week, disease_table, bucket_name)
+                    try:
+                        # Attempt to download the file
+                        download_txt_file(year, week, disease_table, bucket_name)
+                    except Exception as e:
+                        # Log the exception and move on to the next file
+                        print(f"Error downloading file for Year {year}, Week {week}, Table {disease_table}: {e}")
 
     # Run the processing in a separate thread so the function can respond immediately
     executor = ThreadPoolExecutor(max_workers=1)
