@@ -9,13 +9,15 @@ import os
 import functions_framework
 from retrying import retry
 from datetime import datetime
+import uuid
+import json
 
 # Define project and bucket information
 project_id = 'ba882-group-10'
 bucket_name = 'cdc-extract-txt'
 
-@retry(stop_max_attempt_number=2, wait_fixed=1000)  # Retry up to 3 times, wait 2 seconds between retries
-def download_txt_file(year, week, disease_table, bucket_name):
+@retry(stop_max_attempt_number=2, wait_fixed=1000)  # Retry up to 2 times, wait 1 second between retries
+def download_txt_file(year, week, disease_table, bucket_name, job_id):
     url = f'https://wonder.cdc.gov/nndss/static/{year}/{week:02d}/{year}-{week:02d}-table{disease_table:02d}.txt'
     response = requests.get(url)
 
@@ -26,22 +28,26 @@ def download_txt_file(year, week, disease_table, bucket_name):
 
         # Define the filename and blob path
         filename = f'{year}_week{week:02d}_table{disease_table:02d}.txt'
-        blob = bucket.blob(filename)
+        blob_path = f'{job_id}/{filename}'
+        blob = bucket.blob(blob_path)
 
         # Upload the content to the bucket
         blob.upload_from_string(response.content)
-        print(f"Successfully uploaded: {filename} to bucket {bucket_name}")
+        print(f"Successfully uploaded: {filename} to bucket {bucket_name}/{job_id}")
     elif response.status_code == 404:
         print(f"File not found for Year {year}, Week {week}, Table {disease_table} (Status Code: 404)")
     else:
         print(f"Failed to download Year {year}, Week {week}, Table {disease_table} (Status Code: {response.status_code})")
-        raise Exception(f"Download failed for Year {year}, Week {week}, Table {disease_table}")
+        print(f"Download failed for Year {year}, Week {week}, Table {disease_table} (Status Code: {response.status_code})")
 
 # Google Cloud Function entry point
 @functions_framework.http
 def task(request):
+    # Generate a unique job ID
+    job_id = datetime.now().strftime('%Y%m%d_%H%M%S') + '_' + str(uuid.uuid4())
+    
     # Parameters for the function
-    years = [2023,2024]
+    years = [2023, 2024]
     current_week = datetime.now().isocalendar()[1] - 1  # Get the previous week of the current year
     disease_tables = [370, 1129]
 
@@ -57,10 +63,13 @@ def task(request):
                 try:
                     print(f"Attempting download for Year {year}, Week {week}, Table {disease_table}")
                     # Attempt to download the file
-                    download_txt_file(year, week, disease_table, bucket_name)
+                    download_txt_file(year, week, disease_table, bucket_name, job_id)
+                except requests.exceptions.RequestException as e:
+                    # Log the exception and move on to the next file without failing the entire flow
+                    print(f"Network error while downloading file for Year {year}, Week {week}, Table {disease_table}: {e}")
                 except Exception as e:
-                    # Log the exception and move on to the next file
+                    # Log other exceptions and move on to the next file
                     print(f"Error downloading file for Year {year}, Week {week}, Table {disease_table}: {e}")
 
-    return "CDC data download task completed."
-
+    # Always return the job ID regardless of download issues to continue the Prefect flow
+    return json.dumps({"message": "CDC data download task completed.", "job_id": job_id}), 200

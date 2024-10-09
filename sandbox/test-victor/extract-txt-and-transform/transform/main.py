@@ -3,22 +3,29 @@ from google.cloud import storage
 import functions_framework
 import pyarrow
 import io
+import json
 
 # Google Cloud Function entry point
 @functions_framework.http
 def transform_txt_to_dataframe(request):
+    # Parse request to get job_id
+    request_json = request.get_json()
+    job_id = request_json.get('job_id') if request_json else None
+    if not job_id:
+        return "Missing job_id in request payload", 400
+
     # Define project and bucket information
     project_id = 'ba882-group-10'
     bucket_name = 'cdc-extract-txt'
     output_bucket_name = 'cdc-extract-dataframe'
-    output_blob_name = 'cdc_data.parquet'
+    output_blob_name = f'cdc_data_{job_id}.parquet'
 
     # Initialize Google Cloud Storage client
     storage_client = storage.Client(project=project_id)
     bucket = storage_client.bucket(bucket_name)
 
-    # List all text files in the bucket
-    blobs = list(bucket.list_blobs())
+    # List all text files in the bucket for the given job_id
+    blobs = list(bucket.list_blobs(prefix=f"{job_id}/"))
     txt_blobs = [blob for blob in blobs if blob.name.endswith('.txt')]
 
     # Collect data from all files
@@ -36,9 +43,10 @@ def transform_txt_to_dataframe(request):
         disease_name = lines[4].split(";")[0].strip()  # Extracting disease name, e.g., Cryptosporidiosis
 
         # Extract week and year from filename
-        parts = blob.name.split('_')
-        year = parts[0]
-        week = parts[1]
+        filename = blob.name.split('/')[-1]  # Get the actual filename, e.g., '2023_week01_table370.txt'
+        parts = filename.split('_')
+        year = parts[0]  # Should be '2023' or '2024'
+        week = parts[1].replace('week', '')  # Remove 'week' to get just the number
         week_year = f"{year} {week}"
         print(f"Parsed week_year: {week_year}")  # Debugging log
 
@@ -81,4 +89,4 @@ def transform_txt_to_dataframe(request):
     else:
         print("No data to store.")
 
-    return "Data processing and storage completed."
+    return json.dumps({"message": "Data processing and storage completed.", "job_id": job_id})
