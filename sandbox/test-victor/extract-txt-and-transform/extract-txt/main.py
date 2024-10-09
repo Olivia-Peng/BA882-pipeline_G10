@@ -43,7 +43,7 @@ def task(request):
     # Parameters for the function
     years = [2023,2024]
     current_week = datetime.now().isocalendar()[1] - 1  # Get the previous week of the current year
-    disease_tables = [10, 60]
+    disease_tables = [370, 1129]
 
     # Loop over disease tables first, then iterate over years and weeks to download the files
     for disease_table in disease_tables:

@@ -6,7 +6,7 @@ import io
 
 # Google Cloud Function entry point
 @functions_framework.http
-def upload_txt_to_bigquery(request):
+def transform_txt_to_dataframe(request):
     # Define project and bucket information
     project_id = 'ba882-group-10'
     bucket_name = 'cdc-extract-txt'
