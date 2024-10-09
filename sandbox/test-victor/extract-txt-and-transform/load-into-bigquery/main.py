@@ -44,4 +44,4 @@ def load_to_bigquery(request):
     
     print(f"Loaded {len(df)} rows into BigQuery table {table_id}.")
     
-    return "Data successfully loaded into BigQuery."
+    return {}, 200

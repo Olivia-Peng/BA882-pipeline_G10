@@ -21,6 +21,7 @@ gcloud functions deploy download-cdc-data \
     --region us-central1 \
     --allow-unauthenticated \
     --memory 512MB
+    --timeout 180s
 
 # BigQuery schema creation function deployment
 echo "======================================================"

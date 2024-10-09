@@ -57,4 +57,4 @@ def create_bigquery_schema():
 @functions_framework.http
 def create_schema(request):
     create_bigquery_schema()
-    return "Schema created successfully."
+    return {}, 200

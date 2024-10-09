@@ -45,31 +45,32 @@ def download_txt_file(year, week, disease_table, bucket_name, job_id):
 def task(request):
     # Generate a unique job ID
     job_id = datetime.now().strftime('%Y%m%d_%H%M%S') + '_' + str(uuid.uuid4())
-    
+
     # Parameters for the function
     years = [2023, 2024]
-    current_week = datetime.now().isocalendar()[1] - 1  # Get the previous week of the current year
+    current_week = datetime.now().isocalendar()[1] - 1
     disease_tables = [370, 1129]
 
-    # Loop over disease tables first, then iterate over years and weeks to download the files
     for disease_table in disease_tables:
         for year in years:
             if year == 2024:
-                weeks_range = range(1, current_week + 1)  # Up to the current week for 2024
+                weeks_range = range(1, current_week + 1)
             else:
-                weeks_range = range(1, 53)  # All weeks for 2023
+                weeks_range = range(1, 53)
 
             for week in weeks_range:
                 try:
                     print(f"Attempting download for Year {year}, Week {week}, Table {disease_table}")
-                    # Attempt to download the file
                     download_txt_file(year, week, disease_table, bucket_name, job_id)
                 except requests.exceptions.RequestException as e:
-                    # Log the exception and move on to the next file without failing the entire flow
+                    # Log network-related errors and continue
                     print(f"Network error while downloading file for Year {year}, Week {week}, Table {disease_table}: {e}")
+                    pass  # Continue with the next iteration
                 except Exception as e:
-                    # Log other exceptions and move on to the next file
+                    # Log all other errors and continue
                     print(f"Error downloading file for Year {year}, Week {week}, Table {disease_table}: {e}")
+                    pass  # Continue with the next iteration
 
-    # Always return the job ID regardless of download issues to continue the Prefect flow
-    return json.dumps({"message": "CDC data download task completed.", "job_id": job_id}), 200
+    return {"job_id": job_id}, 200
+
+
