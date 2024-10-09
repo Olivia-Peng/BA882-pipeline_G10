@@ -1,5 +1,5 @@
-pandas==1.5.3
-google-cloud-bigquery==3.11.4
-google-cloud-storage==2.10.0
-functions-framework==3.3.0
+pandas==2.2.*
+google-cloud-bigquery==3.*
+google-cloud-storage==2.*
+functions-framework==3.*
 pyarrow==12.0.1  # Required for reading/writing parquet files with pandas
