@@ -9,13 +9,12 @@ import os
 import functions_framework
 from retrying import retry
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
 
 # Define project and bucket information
 project_id = 'ba882-group-10'
 bucket_name = 'cdc-extract-txt'
 
-@retry(stop_max_attempt_number=3, wait_fixed=2000)  # Retry up to 3 times, wait 2 seconds between retries
+@retry(stop_max_attempt_number=2, wait_fixed=1000)  # Retry up to 3 times, wait 2 seconds between retries
 def download_txt_file(year, week, disease_table, bucket_name):
     url = f'https://wonder.cdc.gov/nndss/static/{year}/{week:02d}/{year}-{week:02d}-table{disease_table:02d}.txt'
     response = requests.get(url)
@@ -32,6 +31,8 @@ def download_txt_file(year, week, disease_table, bucket_name):
         # Upload the content to the bucket
         blob.upload_from_string(response.content)
         print(f"Successfully uploaded: {filename} to bucket {bucket_name}")
+    elif response.status_code == 404:
+        print(f"File not found for Year {year}, Week {week}, Table {disease_table} (Status Code: 404)")
     else:
         print(f"Failed to download Year {year}, Week {week}, Table {disease_table} (Status Code: {response.status_code})")
         raise Exception(f"Download failed for Year {year}, Week {week}, Table {disease_table}")
@@ -39,33 +40,27 @@ def download_txt_file(year, week, disease_table, bucket_name):
 # Google Cloud Function entry point
 @functions_framework.http
 def task(request):
-    # Respond immediately to acknowledge the request
+    # Parameters for the function
+    years = [2023,2024]
+    current_week = datetime.now().isocalendar()[1] - 1  # Get the previous week of the current year
+    disease_tables = [10, 60]
 
-    def process():
-        # Parameters for the function
-        years = [2023, 2024]
-        current_week = datetime.now().isocalendar()[1] - 1  # Get the previous week of the current year
-        disease_tables = [10, 60]
+    # Loop over disease tables first, then iterate over years and weeks to download the files
+    for disease_table in disease_tables:
+        for year in years:
+            if year == 2024:
+                weeks_range = range(1, current_week + 1)  # Up to the current week for 2024
+            else:
+                weeks_range = range(1, 53)  # All weeks for 2023
 
-        # Loop over disease tables first, then iterate over years and weeks to download the files
-        for disease_table in disease_tables:
-            for year in years:
-                if year == 2024:
-                    weeks_range = range(1, current_week + 1)  # Up to the current week for 2024
-                else:
-                    weeks_range = range(1, 53)  # All weeks for 2023
+            for week in weeks_range:
+                try:
+                    print(f"Attempting download for Year {year}, Week {week}, Table {disease_table}")
+                    # Attempt to download the file
+                    download_txt_file(year, week, disease_table, bucket_name)
+                except Exception as e:
+                    # Log the exception and move on to the next file
+                    print(f"Error downloading file for Year {year}, Week {week}, Table {disease_table}: {e}")
 
-                for week in weeks_range:
-                    try:
-                        # Attempt to download the file
-                        download_txt_file(year, week, disease_table, bucket_name)
-                    except Exception as e:
-                        # Log the exception and move on to the next file
-                        print(f"Error downloading file for Year {year}, Week {week}, Table {disease_table}: {e}")
-
-    # Run the processing in a separate thread so the function can respond immediately
-    executor = ThreadPoolExecutor(max_workers=1)
-    executor.submit(process)
-
-    return "CDC data download task initiated."
+    return "CDC data download task completed."
 
