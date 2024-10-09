@@ -55,3 +55,21 @@ gcloud functions deploy transform_txt_to_dataframe \
     --region us-central1 \
     --allow-unauthenticated \
     --memory 512MB
+
+
+# Load Parquet data into BigQuery function deployment
+echo "======================================================"
+echo "Deploying the Load to BigQuery Function"
+echo "======================================================"
+
+gcloud functions deploy load-to-bigquery \
+    --gen2 \
+    --runtime python311 \
+    --trigger-http \
+    --entry-point load_to_bigquery \
+    --source ./extract-txt-and-transform/load-into-bigquery \
+    --stage-bucket ba882-cloud-functions-stage \
+    --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --memory 512MB
