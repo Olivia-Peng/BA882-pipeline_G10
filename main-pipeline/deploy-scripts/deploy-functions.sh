@@ -15,12 +15,13 @@ gcloud functions deploy download-cdc-data \
     --runtime python311 \
     --trigger-http \
     --entry-point task \
-    --source ./extract-txt-and-transform/extract-txt \
+    --source ./functions/extract-txt \
     --stage-bucket ba882-cloud-functions-stage \
     --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
     --region us-central1 \
     --allow-unauthenticated \
-    --memory 512MB
+    --memory 1024MB \
+    --timeout 300s
 
 # BigQuery schema creation function deployment
 echo "======================================================"
@@ -32,7 +33,7 @@ gcloud functions deploy create-schema \
     --runtime python311 \
     --trigger-http \
     --entry-point create_schema \
-    --source ./extract-txt-and-transform/schema-setup \
+    --source ./functions/schema-setup \
     --stage-bucket ba882-cloud-functions-stage \
     --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
     --region us-central1 \
@@ -49,7 +50,7 @@ gcloud functions deploy transform_txt_to_dataframe \
     --runtime python311 \
     --trigger-http \
     --entry-point transform_txt_to_dataframe \
-    --source ./extract-txt-and-transform/transform \
+    --source ./functions/transform \
     --stage-bucket ba882-cloud-functions-stage \
     --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
     --region us-central1 \
@@ -59,17 +60,35 @@ gcloud functions deploy transform_txt_to_dataframe \
 
 # Load Parquet data into BigQuery function deployment
 echo "======================================================"
-echo "Deploying the Load to BigQuery Function"
+echo "Deploying the Load to BigQuery Raw Table Function"
 echo "======================================================"
 
-gcloud functions deploy load-to-bigquery \
+gcloud functions deploy load-to-raw \
     --gen2 \
     --runtime python311 \
     --trigger-http \
     --entry-point load_to_bigquery \
-    --source ./extract-txt-and-transform/load-into-bigquery \
+    --source ./functions/load-into-raw \
     --stage-bucket ba882-cloud-functions-stage \
     --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
     --region us-central1 \
     --allow-unauthenticated \
     --memory 512MB
+
+# Upsert Data from Raw to Staging BigQuery Table Function Deployment
+echo "======================================================"
+echo "Deploying the Load to BigQuery Stage Table Function"
+echo "======================================================"
+
+gcloud functions deploy load_to_stage \
+    --gen2 \
+    --runtime python311 \
+    --trigger-http \
+    --entry-point task \
+    --source ./functions/load-into-stage \
+    --stage-bucket ba882-cloud-functions-stage \
+    --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --memory 512MB
+
