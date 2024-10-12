@@ -1,0 +1,61 @@
+import functions_framework
+from google.cloud import secretmanager
+import duckdb
+
+project_id = 'ba882-pipeline-olivia'
+mother_duck_id = 'motherduck' # extract mother duck token to me
+version_id = 'latest' # tell machine you want to you the latest version
+
+## database(db) setting
+db = 'cdc'
+schema = "stage" # "stage" schema: hold data that's not yet ready for final storage or use
+db_schema = f"{db}.{schema}"
+
+
+## retreive motherduck token through Google Cloud Secret Manager
+@functions_framework.http
+def task(request=None):
+
+    # instantiate the services
+    sm = secretmanager.SecretManagerServiceClient()
+
+    # Build the resource name of the secret version
+    name = f"projects/{project_id}/secrets/{mother_duck_id}/versions/{version_id}"
+
+    # Access the secret version
+    response = sm.access_secret_version(request={"name": name})
+    md_token = response.payload.data.decode("UTF-8")
+
+    # initiate the MotherDuck connection through an access token through
+    md = duckdb.connect(f'md:?motherduck_token={md_token}')
+
+## check does the schema exist?
+    # define the DDL statement with an f string
+    create_db_sql = f"CREATE DATABASE IF NOT EXISTS {db};"
+
+    # execute the command to create the database
+    md.sql(create_db_sql)
+
+    # confirm it exists
+    print(md.sql("SHOW DATABASES").show())
+
+    # create the schema
+    md.sql(f"CREATE SCHEMA IF NOT EXISTS {db_schema};")
+
+## create schema
+    # disease_data
+    raw_tbl_name = f"{db_schema}.disease_data"
+    raw_tbl_sql = f"""
+    CREATE TABLE IF NOT EXISTS {raw_tbl_name} (
+        Disease VARCHAR,
+        Region VARCHAR,
+        Current_week_count INT,
+        Year_Week TIMESTAMP,
+        PRIMARY KEY (Disease, Region, Year_Week)
+    );
+    """
+    print(f"{raw_tbl_sql}")
+    md.sql(raw_tbl_sql)
+
+
+    return {}, 200
