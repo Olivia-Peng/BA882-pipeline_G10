@@ -1,1 +1,49 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+
+# Step 1: Prepare the dataset
+def prepare_data(data):
+    X = data[['Cum YTD 2023', 'Cum YTD 2024', 'Population']].fillna(0)
+    y = data['Current week'].fillna(0)
+    
+    # Optional: Encode 'Reporting Area' as a categorical feature (for different zones)
+    X = pd.get_dummies(X, columns=['Reporting Area'], drop_first=True)
+    
+    return X, y
+
+# Step 2: Train and test the model
+def train_random_forest(X, y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+
+    mse = mean_squared_error(y_test, y_pred)
+    print(f'Mean Squared Error: {mse}')
+    
+    return model
+
+# Step 3: Predict disease cases for future weeks
+def predict_future_cases(model, future_data):
+    predictions = model.predict(future_data)
+    return predictions
+
+# Step 4: Main function to bring it all together
+def main():
+    data = fetch_and_clean_cdc_data(38, 10)  # Example week and table number
+    X, y = prepare_data(data)
+
+    model = train_random_forest(X, y)
+
+    future_data = X  # This would be replaced with actual future data
+    future_predictions = predict_future_cases(model, future_data)
+    
+    print(f'Predictions for future weeks: {future_predictions}')
+
+main()
 
