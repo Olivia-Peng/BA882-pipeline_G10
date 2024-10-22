@@ -1,1 +1,24 @@
+#ML Time Series with SARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+def train_sarima(data, zone):
+    zone_data = data[data['Reporting Area'] == zone]
+    
+    zone_data.set_index('Week', inplace=True)
+
+    model = SARIMAX(zone_data['Current week'], order=(1,1,1), seasonal_order=(1,1,1,52))
+    model_fit = model.fit(disp=False)
+    
+    return model_fit
+
+def predict_sarima(model_fit, steps=10):
+    forecast = model_fit.forecast(steps=steps)
+    print(f"Forecast for the next {steps} weeks: {forecast}")
+    return forecast
+
+def main_sarima():
+    data = fetch_and_clean_cdc_data(38, 10)  
+    model_fit = train_sarima(data, 'New York City')  
+    predictions = predict_sarima(model_fit, steps=10)  
+
+main_sarima()
 
