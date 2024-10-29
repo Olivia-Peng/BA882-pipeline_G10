@@ -1,0 +1,4 @@
+requests==2.*
+google-cloud-storage
+functions-framework==3.*
+retrying
