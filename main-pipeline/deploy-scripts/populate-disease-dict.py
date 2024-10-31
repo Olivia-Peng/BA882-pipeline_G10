@@ -1,12 +1,19 @@
 from google.cloud import bigquery
+from google.oauth2 import service_account
 
 # Function to populate the disease_dic table with disease codes and labels, avoiding duplicates
 def populate_disease_dic():
-    # Initialize BigQuery client
-    client = bigquery.Client()
+    # Define the path to your service account key file
+    key_path = "gcp/ba882-group-10-9cf9eec218f4.json"  # Path to the service account key
+
+    # Load credentials from the JSON key file
+    credentials = service_account.Credentials.from_service_account_file(key_path)
+
+    # Initialize BigQuery client with the service account credentials
+    client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
     # Define dataset and table information
-    dataset_id = "ba882-group-10.cdc_data"  # Replace with your dataset ID
+    dataset_id = "ba882-group-10.cdc_data"
     disease_dic_id = f"{dataset_id}.disease_dic"
 
     # Data to be inserted
@@ -40,3 +47,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
