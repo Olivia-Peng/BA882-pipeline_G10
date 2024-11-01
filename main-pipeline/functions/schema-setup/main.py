@@ -21,7 +21,7 @@ def create_bigquery_schema():
         bigquery.SchemaField("Disease", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("Region", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("Current_Week_Occurrence_Count", "INTEGER", mode="REQUIRED"),
-        bigquery.SchemaField("Week_Year", "STRING", mode="REQUIRED")
+        bigquery.SchemaField("Date", "Date", mode="REQUIRED")
     ]
     
     # Set up raw table information
@@ -42,7 +42,7 @@ def create_bigquery_schema():
         bigquery.SchemaField("Disease", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("Region", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("Current_Week_Occurrence_Count", "INTEGER", mode="REQUIRED"),
-        bigquery.SchemaField("Week_Year", "STRING", mode="REQUIRED")
+        bigquery.SchemaField("Date", "Date", mode="REQUIRED")
     ]
     
     # Set up staging table information
