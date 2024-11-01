@@ -1,9 +1,22 @@
+# This script is designed to be run as a Google Cloud Function. It transforms disease data in .txt format stored in a Google Cloud Storage bucket into a structured DataFrame.
+# The script extracts relevant information from the text files, filters out specific regions, and stores the processed data as a Parquet file in another Google Cloud Storage bucket.
+# The script performs the following tasks:
+# 1. Parses the request payload to retrieve a job ID.
+# 2. Lists all text files in the specified Google Cloud Storage bucket for the given job ID.
+# 3. Defines a set of regions to exclude from processing.
+# 4. Extracts the date information from a specific line in the text file using a regular expression.
+# 5. Processes each text file to extract disease name, region, and occurrence count, skipping lines for excluded regions.
+# 6. Converts the collected data into a Pandas DataFrame.
+# 7. Stores the DataFrame as a Parquet file in the output Google Cloud Storage bucket.
+
 import pandas as pd
 from google.cloud import storage
 import functions_framework
 import pyarrow
 import io
 import json
+import re
+from datetime import datetime
 
 # Google Cloud Function entry point
 @functions_framework.http
@@ -31,6 +44,37 @@ def transform_txt_to_dataframe(request):
     # Collect data from all files
     all_data = []
 
+    # Define regions to exclude
+    excluded_regions = {
+        'U.S. Residents, excluding U.S. Territories',
+        'New England',
+        'Middle Atlantic',
+        'East North Central',
+        'West North Central',
+        'South Atlantic',
+        'East South Central',
+        'West South Central',
+        'Mountain',
+        'Pacific',
+        'U.S. Territories',
+        'Non-U.S. Residents',
+        'Total'
+    }
+
+    # Helper function to extract date from a specific line
+    def extract_date_from_line(line):
+        # Define the regular expression pattern
+        pattern = r"Non-U\.S\. Residents week ending (\w+ \d{1,2}, \d{4})"
+        match = re.search(pattern, line)
+
+        if match:
+            date_str = match.group(1)  # Extract the date part
+            # Convert the extracted date string to a standardized date format
+            extracted_date = datetime.strptime(date_str, "%B %d, %Y").strftime('%Y-%m-%d')
+            return extracted_date
+        else:
+            return None
+
     # Process each text file
     for blob in txt_blobs:
         print(f"Processing file: {blob.name}")
@@ -42,13 +86,13 @@ def transform_txt_to_dataframe(request):
         # Extract relevant information from the text
         disease_name = lines[4].split(";")[0].strip()  # Extracting disease name, e.g., Cryptosporidiosis
 
-        # Extract week and year from filename
-        filename = blob.name.split('/')[-1]  # Get the actual filename, e.g., '2023_week01_table370.txt'
-        parts = filename.split('_')
-        year = parts[0]  # Should be '2023' or '2024'
-        week = parts[1].replace('week', '')  # Remove 'week' to get just the number
-        week_year = f"{year} {week}"
-        print(f"Parsed week_year: {week_year}")  # Debugging log
+        # Extract the date from the specific line containing "Non-U.S. Residents week ending"
+        date_line = lines[0]  # Assuming the date is in the first line
+        Date = extract_date_from_line(date_line)
+        if not Date:
+            print(f"Date not found in file {blob.name}")
+            continue  # Skip this file if date extraction fails
+        print(f"Parsed Date: {Date}")  # Debugging log
 
         # Start reading tab-delimited data from the appropriate line
         start_index = 7  # Data starts from line 7 in the provided file
@@ -57,36 +101,4 @@ def transform_txt_to_dataframe(request):
                 continue  # Skip empty lines, the 'Total' line, and lines with fewer than 2 columns
 
             columns = line.strip().split("\t")
-            region = columns[0]
-            current_week_count = columns[1]
-
-            # Handle non-numeric counts (e.g., '-', 'N', 'U')
-            try:
-                current_week_count = int(current_week_count)
-            except ValueError:
-                current_week_count = 0  # Set to 0 if the value is not a valid integer
-
-            # Append the extracted data to the list
-            all_data.append({
-                "Disease": disease_name,
-                "Region": region,
-                "Current_Week_Occurrence_Count": current_week_count,
-                "Week_Year": week_year
-            })
-
-    # Convert list to DataFrame
-    df = pd.DataFrame(all_data)
-
-    # Store DataFrame in Google Cloud Storage as a Parquet file
-    if not df.empty:
-        output_bucket = storage_client.bucket(output_bucket_name)
-        output_buffer = io.BytesIO()
-        df.to_parquet(output_buffer, index=False)
-        output_buffer.seek(0)  # Reset buffer position to the beginning
-        output_blob = output_bucket.blob(output_blob_name)
-        output_blob.upload_from_file(output_buffer, content_type='application/octet-stream')
-        print(f"Stored DataFrame to {output_bucket_name}/{output_blob_name}")
-    else:
-        print("No data to store.")
-
-    return json.dumps({"message": "Data processing and storage completed.", "job_id": job_id})
+            region = columns[0].strip()  # Ensure to strip spaces for
