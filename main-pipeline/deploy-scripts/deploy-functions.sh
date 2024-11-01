@@ -20,8 +20,8 @@ gcloud functions deploy download-cdc-data \
     --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
     --region us-central1 \
     --allow-unauthenticated \
-    --memory 1024MB \
-    --timeout 300s
+    --memory 2048MB \
+    --timeout 600s
 
 # BigQuery schema creation function deployment
 echo "======================================================"
@@ -55,7 +55,8 @@ gcloud functions deploy transform_txt_to_dataframe \
     --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
     --region us-central1 \
     --allow-unauthenticated \
-    --memory 512MB
+    --memory 1024MB \
+    --timeout 300s
 
 
 # Load Parquet data into BigQuery function deployment

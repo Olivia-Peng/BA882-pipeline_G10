@@ -1,7 +1,7 @@
 # Google Cloud Function to upsert records from raw table to staging table in BigQuery
 # 
 # This function takes records from the raw table (`cdc_occurrences_raw`) and inserts them into the staging table (`cdc_occurrences_staging`) in BigQuery.
-# It ensures that only new records are copied from the raw table to the staging table, based on the unique combination of Disease, Region, and Week_Year.
+# It ensures that only new records are copied from the raw table to the staging table, based on the unique combination of Disease, Region, and Date.
 # Records that already exist in the staging table are not duplicated.
 
 # imports
@@ -30,11 +30,11 @@ def task(request):
 
     # Query to get records from raw table that are not in the staging table
     query = f"""
-    INSERT INTO `{stage_table_id}` (Disease, Region, Current_Week_Occurrence_Count, Week_Year)
-    SELECT r.Disease, r.Region, r.Current_Week_Occurrence_Count, r.Week_Year
+    INSERT INTO `{stage_table_id}` (Disease, Region, Current_Week_Occurrence_Count, Date)
+    SELECT r.Disease, r.Region, r.Current_Week_Occurrence_Count, r.Date
     FROM `{raw_table_id}` r
     LEFT JOIN `{stage_table_id}` s
-    ON r.Disease = s.Disease AND r.Region = s.Region AND r.Week_Year = s.Week_Year
+    ON r.Disease = s.Disease AND r.Region = s.Region AND r.Date = s.Date
     WHERE s.Disease IS NULL
     """
 
