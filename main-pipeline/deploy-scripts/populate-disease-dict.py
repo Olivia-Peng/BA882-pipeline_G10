@@ -21,7 +21,14 @@ def populate_disease_dic():
         {"disease_code": 250, "disease_label": "Babesiosis"},
         {"disease_code": 350, "disease_label": "Campylobacteriosis"},
         {"disease_code": 354, "disease_label": "Candida auris"},
-        {"disease_code": 370, "disease_label": "Chlamydia trachomatis infection"}
+        {"disease_code": 370, "disease_label": "Chlamydia trachomatis infection"},
+        {"disease_code": 560, "disease_label": "Gonorrhea"},
+        {"disease_code": 550, "disease_label": "Giardiasis"},
+        {"disease_code": 392, "disease_label": "Coccidioidomycosis"},
+        {"disease_code": 1140, "disease_label": "Shigellosis"},
+        {"disease_code": 1130, "disease_label": "Shiga toxin-producing Escherichia coli (STEC)"},
+        {"disease_code": 1122, "disease_label": "Salmonellosis (excluding Salmonella Typhi infection and Salmonella Paratyphi infection)"}
+
     ]
 
     # Query to check for existing records
