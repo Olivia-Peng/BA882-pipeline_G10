@@ -49,7 +49,7 @@ def task(request):
     # Parameters for the function
     years = [2023, 2024]
     current_week = datetime.now().isocalendar()[1] - 1
-    disease_tables = [250, 350,354,370]
+    disease_tables = [370,560,350,1122,392,1140,550,1130]
 
     for disease_table in disease_tables:
         for year in years:
