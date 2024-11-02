@@ -5,7 +5,7 @@
 # 2. Lists all text files in the specified Google Cloud Storage bucket for the given job ID.
 # 3. Defines a set of regions to exclude from processing.
 # 4. Extracts the date information from a specific line in the text file using a regular expression.
-# 5. Processes each text file to extract disease name, region, and occurrence count, skipping lines for excluded regions.
+# 5. Processes each text file to extract disease code, region, and occurrence count, skipping lines for excluded regions.
 # 6. Converts the collected data into a Pandas DataFrame.
 # 7. Stores the DataFrame as a Parquet file in the output Google Cloud Storage bucket.
 
@@ -100,16 +100,21 @@ def transform_txt_to_dataframe(request):
         try:
             print(f"Processing file: {blob.name}")
 
+            # Extract disease code from the filename
+            disease_code_match = re.search(r"table(\d+)", blob.name)
+            if disease_code_match:
+                disease_code = disease_code_match.group(1)
+                print(f"Extracted disease code: {disease_code}")
+            else:
+                print(f"Disease code not found in file name {blob.name}")
+                continue  # Skip this file if disease code extraction fails
+
             # Download file content
             file_content = blob.download_as_text(encoding='ISO-8859-1')
             lines = file_content.splitlines()
             if len(lines) < 5:
-                print(f"File {blob.name} does not contain enough lines to extract disease name")
+                print(f"File {blob.name} does not contain enough lines to extract data")
                 continue
-
-            # Extract relevant information from the text
-            disease_name = lines[4].split(";")[0].strip()  # Extracting disease name, e.g., Cryptosporidiosis
-            print(f"Extracted disease name: {disease_name}")
 
             # Extract the date from the specific line containing "Non-U.S. Residents week ending"
             date_line = lines[0]  # Assuming the date is in the first line
@@ -144,7 +149,7 @@ def transform_txt_to_dataframe(request):
 
                 # Append the extracted data to the list
                 all_data.append({
-                    "Disease": disease_name,
+                    "Disease": disease_code,
                     "Region": region,
                     "Current_Week_Occurrence_Count": current_week_count,
                     "Date": Date  # Use dynamically extracted date
@@ -180,4 +185,5 @@ def transform_txt_to_dataframe(request):
         print("No data to store.")
 
     return json.dumps({"message": "Data processing and storage completed.", "job_id": job_id})
+
 
