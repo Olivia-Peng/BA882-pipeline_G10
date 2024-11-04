@@ -1,0 +1,31 @@
+1. Navigate to the folder containing all the files for vertex-SARIMA.
+
+cd /home/cholivia/BA882-Olivia-testing/try/vertex_SARIMA/
+
+2. After creating the three necessary files within the vertex-SARIMA folder: main.py, setup.py, and requirements.txt, package them into a .tar.gz file.
+
+tar -czvf main.tar.gz main.py setup.py requirements.txt
+
+3. Upload the .tar.gz file to your designated storage bucket.
+
+gsutil cp main.tar.gz gs://ba882_olivia/main.tar.gz
+
+4. Finally, proceed to deploy the code.
+
+gcloud ai custom-jobs create \
+    --region=us-central1 \
+    --display-name="sarima-training-job" \
+    --config=custom-job.yaml
+
+
+!!! Important!!!
+If you want to use the same service account as in phase one, you need to assign additional roles to the service account to enable it to support Vertex AI.
+
+Roles:
+1. BigQuery Admin
+2. BigQuery Data Viewer
+3. BigQuery Job User
+4. Storage Admin
+5. Storage Object Admin
+6. Storage Object Creator
+7. Storage Object Viewer
