@@ -227,6 +227,75 @@ predefined_data = {
         ),
         "Prevention": "N/A",
         "Treatment and Recovery": "N/A"
+    },
+    "Babesiosis": {
+        "Overview": (
+            "Babesiosis is a disease caused by microscopic parasites that infect red blood cells. A parasite is an organism (living thing) that lives on or inside another organism. "
+            "Although there are many different species (types) of Babesia parasite found in animals, only a few infect people. The most common species to infect people in the United States is Babesia microti."
+        ),
+        "How it Spreads": (
+            "In the U.S., most Babesia infections are from blacklegged or deer tick (Ixodes scapularis) bites. Ticks are typically found in wooded, brushy, or grassy areas. "
+            "Currently, most babesiosis cases occur in the Northeast and upper Midwest. Other less common ways of getting infected with Babesia include getting a blood transfusion "
+            "that has the parasite in it or if a mother has babesiosis, she might pass it to her baby during pregnancy or when the baby is born. "
+            "Babesia parasites do not spread from person-to-person like the flu or the common cold."
+        ),
+        "Symptoms in Women": (
+            "Many people with Babesiosis do not feel sick and have no symptoms. However, some people might get flu-like symptoms, such as: "
+            "Fever, Chills, Sweats, Headache, Body aches, Loss of appetite, Nausea, Fatigue. Since the parasites attack red blood cells, babesiosis can lead to hemolytic anemia. "
+            "Hemolytic anemia occurs when your red blood cells are destroyed faster than they can be replaced."
+        ),
+        "Symptoms in Men": (
+            "Many people with Babesiosis do not feel sick and have no symptoms. However, some people might get flu-like symptoms, such as: "
+            "Fever, Chills, Sweats, Headache, Body aches, Loss of appetite, Nausea, Fatigue. Since the parasites attack red blood cells, babesiosis can lead to hemolytic anemia. "
+            "Hemolytic anemia occurs when your red blood cells are destroyed faster than they can be replaced."
+        ),
+        "Symptoms from Rectal Infections": (
+            "Many people with Babesiosis do not feel sick and have no symptoms. However, some people might get flu-like symptoms, such as: "
+            "Fever, Chills, Sweats, Headache, Body aches, Loss of appetite, Nausea, Fatigue. Since the parasites attack red blood cells, babesiosis can lead to hemolytic anemia. "
+            "Hemolytic anemia occurs when your red blood cells are destroyed faster than they can be replaced."
+        ),
+        "Prevention": (
+            "To reduce your risk of babesiosis, avoid outdoor areas infested with ticks. If you are in these areas, use tick repellents, wear socks, long-sleeved shirts, and pants, "
+            "and check yourself and pets for ticks before going inside."
+        ),
+        "Treatment and Recovery": (
+            "If you have babesiosis, there is effective treatment. You usually do not need treatment if you have no symptoms or signs of babesiosis. "
+            "Talk with your healthcare provider for more information."
+        )
+    },
+    "Candida auris": {
+        "Overview": (
+            "Candida auris is a type of yeast that can cause severe illness and spreads easily among patients in healthcare facilities. "
+            "C. auris can cause a range of infections from superficial (skin) infections to more severe, life-threatening infections, such as bloodstream infections. "
+            "C. auris is often resistant to antifungal medications, meaning the fungus develops the ability to defeat the drugs designed to kill it. "
+            "This means the germs are not killed and continue to grow, making resistant infections difficult, and sometimes impossible, to treat."
+        ),
+        "How it Spreads": (
+            "Patients who are infected and patients who are colonized with C. auris can spread it onto surfaces and objects like bedrails, doorknobs, and blood pressure cuffs. "
+            "C. auris can survive on surfaces and objects for a long time and spread to other patients who can become sick. "
+            "C. auris usually remains on a patient's skin or body sites for a long time, whether or not they ever have symptoms, but they will still be able to spread C. auris."
+        ),
+        "Symptoms in Women": (
+            "C. auris can cause infection in different parts of the body like the blood, wounds, and ears. Symptoms of a C. auris infection depend on the location and severity of the infection. "
+            "Symptoms may be similar to symptoms of infections caused by bacteria, such as fever or chills. There is not a common set of symptoms specific for C. auris infections."
+        ),
+        "Symptoms in Men": (
+            "C. auris can cause infection in different parts of the body like the blood, wounds, and ears. Symptoms of a C. auris infection depend on the location and severity of the infection. "
+            "Symptoms may be similar to symptoms of infections caused by bacteria, such as fever or chills. There is not a common set of symptoms specific for C. auris infections."
+        ),
+        "Symptoms from Rectal Infections": (
+            "C. auris can cause infection in different parts of the body like the blood, wounds, and ears. Symptoms of a C. auris infection depend on the location and severity of the infection. "
+            "Symptoms may be similar to symptoms of infections caused by bacteria, such as fever or chills. There is not a common set of symptoms specific for C. auris infections."
+        ),
+        "Prevention": (
+            "Healthcare providers take special steps to prevent the spread of C. auris while infected or colonized patients are in healthcare facilities. "
+            "Patients should inform healthcare providers about their previous infection or screening results before receiving healthcare after discharge."
+        ),
+        "Treatment and Recovery": (
+            "Most strains (types) of C. auris are resistant to at least one type of antifungal medicine. Fortunately, most infections can be treated with a class of antifungal medications called echinocandins. "
+            "However, some C. auris strains are resistant to all three main classes of antifungal medicines, including echinocandins. "
+            "There is limited data on the treatment of these infections. Healthcare providers may combine multiple antifungal medicines or try a newer pre-approved antifungal to treat multidrug-resistant infections."
+        )
     }
 }
 
