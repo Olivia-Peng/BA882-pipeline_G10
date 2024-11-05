@@ -8,7 +8,7 @@ table_id = "symptom"
 
 # List of diseases and their predefined text for each section
 predefined_data = {
-    "Campylobacter": {
+    "350": {
         "Overview": (
             "Campylobacter are bacteria that can make people ill with diarrhea. The illness is called campylobacteriosis. "
             "Campylobacter cause the most bacterial diarrheal illnesses in the United States. CDC estimates that 1.5 million people in the United States get ill from Campylobacter every year."
@@ -23,7 +23,7 @@ predefined_data = {
         "Prevention": "N/A",
         "Treatment and Recovery": "N/A"
     },
-    "Chlamydia": {
+    "370": {
         "Overview": (
             "Chlamydia is a common STI that can cause infection among men and women. "
             "It can cause permanent damage to a woman's reproductive system. This can make it difficult or impossible to get pregnant later. "
@@ -59,7 +59,7 @@ predefined_data = {
             "Repeat infection with chlamydia is common. You should receive testing again about three months after your treatment, even if your sex partner(s) receives treatment."
         )
     },
-    "E. coli": {
+    "1130": {
         "Overview": (
             "E. coli are germs called bacteria. They are found in many places, including in the environment, foods, "
             "water, and the intestines of people and animals. "
@@ -73,7 +73,7 @@ predefined_data = {
         "Prevention": "N/A",
         "Treatment and Recovery": "N/A"
     },
-    "Giardia": {
+    "550": {
         "Overview": (
             "Giardia duodenalis (Giardia for short) is a parasite. Illness caused by Giardia is called giardiasis. "
             "Giardia lives in the gut of infected people and animals and comes out of the body in poop. Giardia can survive for weeks to months outside the body (for example, in soil). "
@@ -113,7 +113,7 @@ predefined_data = {
             "If you have diarrhea, drink a lot of water or other fluids to avoid dehydration (loss of fluids)."
         )
     },
-    "Gonorrhea": {
+    "560": {
         "Overview": (
             "Gonorrhea is an STI that can cause infection in the genitals, rectum, and throat. "
             "It is very common, especially among young people ages 15-24 years."
@@ -147,7 +147,7 @@ predefined_data = {
             "Return to a healthcare provider if your symptoms continue for more than a few days after receiving treatment."
         )
     },
-    "Salmonella": {
+    "1122": {
         "Overview": (
             "Salmonella are bacteria (germs) that can make people sick with an illness called salmonellosis. "
             "People can get infected after swallowing Salmonella. "
@@ -161,7 +161,7 @@ predefined_data = {
         "Prevention": "N/A",
         "Treatment and Recovery": "N/A"
     },
-    "Shigella": {
+    "1140": {
         "Overview": (
             "Shigella bacteria cause an infection called shigellosis. Shigella cause an estimated 450,000 infections in the United States each year, "
             "and antimicrobial resistant infections result in an estimated $93 million in direct medical costs. "
@@ -200,7 +200,7 @@ predefined_data = {
             "If you have diarrhea, drink a lot of water or other fluids to avoid dehydration (loss of fluids)."
         )
     },
-    "Valley Fever": {
+    "392": {
         "Overview": (
             "Valley fever (coccidioidomycosis) is a lung infection caused by Coccidioides, a fungus that lives in the soil. "
             "The fungus is found in the Pacific Northwest and southwestern United States, and parts of Mexico, Central America, and South America. "
@@ -228,7 +228,7 @@ predefined_data = {
         "Prevention": "N/A",
         "Treatment and Recovery": "N/A"
     },
-    "Babesiosis": {
+    "250": {
         "Overview": (
             "Babesiosis is a disease caused by microscopic parasites that infect red blood cells. A parasite is an organism (living thing) that lives on or inside another organism. "
             "Although there are many different species (types) of Babesia parasite found in animals, only a few infect people. The most common species to infect people in the United States is Babesia microti."
@@ -263,7 +263,7 @@ predefined_data = {
             "Talk with your healthcare provider for more information."
         )
     },
-    "Candida auris": {
+    "354": {
         "Overview": (
             "Candida auris is a type of yeast that can cause severe illness and spreads easily among patients in healthcare facilities. "
             "C. auris can cause a range of infections from superficial (skin) infections to more severe, life-threatening infections, such as bloodstream infections. "
