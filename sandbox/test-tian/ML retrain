@@ -1,1 +1,62 @@
+#ML part for phase 2(SARIMA and Random Forest method) with sample data cleaning
+import pandas as pd
+import numpy as np
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+
+url = 'https://wonder.cdc.gov/nndss/static/2024/01/2024-01-table60.html'
+data = pd.read_html(url)[0]
+
+#the data has columns: 'Current week', 'Previous 52 weeks Max †', 'Cum YTD 2024 †', 'CumYTD 2023 †'
+#data['Week'] = pd.to_datetime(data['Week'])
+#data.set_index('Week', inplace=True)
+
+data = data[['Current week', 'Previous 52 weeks Max †', 'Cum YTD 2024 †', 'CumYTD 2023 †']]
+
+train = data.iloc[:-1]
+test = data.iloc[-1:]
+
+def sarima_forecast(train, order, seasonal_order):
+    model = SARIMAX(train['Current week'], order=order, seasonal_order=seasonal_order)
+    model_fit = model.fit(disp=False)
+    forecast = model_fit.forecast(steps=1)
+    return forecast
+
+def random_forest_forecast(train, features, target):
+    X_train = train[features]
+    y_train = train[target]
+    model = RandomForestRegressor(n_estimators=100)
+    model.fit(X_train, y_train)
+    forecast = model.predict(X_train[-1:].values.reshape(1, -1))
+    return forecast
+
+sarima_order = (1, 1, 1)
+seasonal_order = (1, 1, 1, 52)
+
+features = ['Previous 52 weeks Max †', 'Cum YTD 2024 †', 'CumYTD 2023 †']
+target = 'Current week'
+
+#Forecast using SARIMA
+sarima_pred = sarima_forecast(train, sarima_order, seasonal_order)
+
+#Forecast using Random Forest
+rf_pred = random_forest_forecast(train, features, target)
+
+#Compare predictions with actual data
+actual = test['Current week'].values[0]
+sarima_mse = mean_squared_error([actual], sarima_pred)
+rf_mse = mean_squared_error([actual], rf_pred)
+
+mse_threshold = 100  
+
+if sarima_mse > mse_threshold or rf_mse > mse_threshold:
+    #Retrain SARIMA
+    sarima_pred = sarima_forecast(data, sarima_order, seasonal_order)
+    #Retrain Random Forest
+    rf_pred = random_forest_forecast(data, features, target)
+
+print(f"SARIMA Prediction: {sarima_pred[0]}, MSE: {sarima_mse}")
+print(f"Random Forest Prediction: {rf_pred[0]}, MSE: {rf_mse}")
+print(f"Actual: {actual}")
 
