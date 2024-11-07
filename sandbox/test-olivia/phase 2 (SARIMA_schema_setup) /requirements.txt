@@ -1,3 +1,0 @@
-functions-framework
-google-cloud-bigquery
-flask
