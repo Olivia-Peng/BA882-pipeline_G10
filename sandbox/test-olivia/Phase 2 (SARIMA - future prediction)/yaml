@@ -1,0 +1,13 @@
+worker_pool_specs:
+  - machine_spec:
+      machine_type: "n1-standard-4"
+    replica_count: 1
+    python_package_spec:
+      executor_image_uri: "us-docker.pkg.dev/vertex-ai/training/tf-cpu.2-8:latest"
+      package_uris:
+        - "gs://ba882_olivia/main.tar.gz"
+      python_module: "main"  # Ensure this matches the name of your Python file/module without the .py
+      args:
+        - "--data-source=ba882-pipeline-olivia.CDC.staging"
+        - "--project-id=ba882-pipeline-olivia"
+        - "--dataset-id=CDC"
