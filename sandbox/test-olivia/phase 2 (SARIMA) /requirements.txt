@@ -1,5 +1,0 @@
-google-cloud-bigquery
-pandas
-pandas-gbq
-statsmodels
-functions-framework
