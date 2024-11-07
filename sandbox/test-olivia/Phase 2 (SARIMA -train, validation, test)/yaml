@@ -1,0 +1,14 @@
+workerPoolSpecs:
+  - machineSpec:
+      machineType: "n1-standard-4"
+    replicaCount: 1
+    containerSpec:
+      imageUri: "gcr.io/ba882-pipeline-olivia/sarima-image"
+      args: []
+      env:
+        - name: PROJECT_ID
+          value: "ba882-pipeline-olivia"
+        - name: DATASET_ID
+          value: "CDC"
+        - name: TABLE_NAME
+          value: "SARIMA_2"
