@@ -1,0 +1,57 @@
+1. Navigate to the directory you are working with
+cd /home/cholivia/BA882-Olivia-testing/try/SARIMA_tvt/
+
+2. Everytime when you change your code on main.py, requirements.txt, .yaml, Dockerfile, you need to push the Dockerfile again
+# go to Container Registry and verify that sarima-image exist
+docker build -t gcr.io/ba882-pipeline-olivia/sarima-image .
+docker push gcr.io/ba882-pipeline-olivia/sarima-image
+
+3. Last, deploy the code
+gcloud ai custom-jobs create \
+  --region=us-central1 \
+  --project=ba882-pipeline-olivia \
+  --display-name="sarima_tvt_training_job" \
+  --config=/home/cholivia/BA882-Olivia-testing/try/SARIMA_tvt/vertex_job_config.yaml \
+  --service-account=pipeline-testing@ba882-pipeline-olivia.iam.gserviceaccount.com \
+  --verbosity=debug
+
+
+In time series modeling with SARIMA (Seasonal Autoregressive Integrated Moving Average), splitting the data into training, validation, and test sets is a bit different than in standard machine learning because the data is sequential.
+
+1. So, you must split the data in a way that maintains the chronological order. This avoids data leakage, where future information is inadvertently used to predict past values. Instead of shuffling data randomly, we split it by time. 
+
+  - Training: Jan 2023 - Dec 2023
+  - Validation: Jan 2024 - Sep 2024
+  - Test: Oct 2024 - Dec 2024
+
+2. Hyperparameter tunning: finding the best combination of SARIMA parameters (p, d, q) and seasonal parameters (P, D, Q, s) by evaluating model performance on the validation set. 
+
+• (p, d, q): These control short-term patterns: 
+
+p: Number of past values used to predict the next one.
+
+d: Number of times we difference the data to make it stable.
+
+q: Number of past prediction errors included.
+
+• (P, D, Q, s): These handle seasonal patterns: 
+
+P: Number of past seasonal values.
+
+D: Seasonal differencing to remove seasonal trends.
+
+Q: Past seasonal errors.
+
+s: Length of the season (e.g., 12 for monthly data with yearly seasonality).
+
+  
+
+Workflow:
+
+1. Split the date into train, validation, and test dataset.
+
+2. Use validation dataset to find the best hyperparameter (use hyperparameter tuning).
+
+3. Use the best performance hyperparameter to work on the train dataset.
+
+4. Last, work on test dataset to do the prediction.
