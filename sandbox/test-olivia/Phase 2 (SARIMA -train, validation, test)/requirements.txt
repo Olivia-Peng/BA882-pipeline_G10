@@ -1,0 +1,8 @@
+google-cloud-bigquery==3.3.3
+google-cloud-storage==2.7.0
+statsmodels
+scikit-learn
+pandas==1.5.3
+numpy<2.0.0  # Ensure compatibility with dependencies
+pyarrow<10.0.0  # Compatible with google-cloud-bigquery
+db-dtypes  # New dependency
