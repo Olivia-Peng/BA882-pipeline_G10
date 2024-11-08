@@ -3,7 +3,7 @@ from prefect.events import DeploymentEventTrigger
 
 if __name__ == "__main__":
     flow.from_source(
-        source="https://github.com/victor-floriano/ba882-victor-floriano.git@",
+        source="https://github.com/victor-floriano/ba882-victor-floriano.git@victor-ticket-24",
         entrypoint="mlops-pipeline/flows/create-cdc-views.py:cdc_ml_datasets",
     ).deploy(
         name="cdc-disease-ml-datasets",
