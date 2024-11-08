@@ -1,0 +1,19 @@
+# Google Cloud libraries
+google-cloud-storage
+google-cloud-bigquery
+functions_framework==3.*
+
+# Extra
+db-dtypes
+
+# Data processing
+pandas
+numpy<2.0.0  # Ensure compatibility with dependencies
+gcsfs
+
+# Time series modeling
+statsmodels
+
+# Machine learning utilities
+scikit-learn==1.2.*
+joblib==1.2.*
