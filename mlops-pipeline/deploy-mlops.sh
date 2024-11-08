@@ -17,3 +17,24 @@ gcloud functions deploy create_cdc_views \
     --allow-unauthenticated \
     --memory 1024MB \
     --timeout 600s
+
+
+echo "======================================================"
+echo "Deploying the MLOps Model Schema Creation Function"
+echo "======================================================"
+
+gcloud functions deploy mlops_create_schema \
+    --gen2 \
+    --runtime python311 \
+    --trigger-http \
+    --entry-point create_schema \
+    --source ./functions/schema-setup \
+    --stage-bucket ba882-cloud-functions-stage \
+    --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --memory 1024MB \
+    --timeout 600s
+
+
+
