@@ -14,7 +14,7 @@ def invoke_gcf(url: str, payload: dict):
 @task(retries=2)
 def create_cdc_views():
     """Invoke the CDC occurrences Cloud Function to create views and export data to GCS."""
-    url = "https://create-cdc-views-548628906045.us-central1.run.app"  # Replace with the actual URL of your deployed Cloud Function
+    url = "https://create-cdc-views-162771833878.us-central1.run.app"  
     resp = invoke_gcf(url, payload={})
     return resp
 
