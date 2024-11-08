@@ -14,7 +14,7 @@ if __name__ == "__main__":
         },
         tags=["prod"],
         description="Pipeline to create CDC disease occurrences ML datasets after data extraction to BigQuery.",
-        version="1.0.0",
+        version="1.0.1",
         triggers=[
             DeploymentEventTrigger(
                 expect={"prefect.flow-run.Completed"},
