@@ -1,0 +1,7 @@
+google-cloud-storage    
+google-cloud-bigquery                   
+joblib                    
+pandas                     
+scipy                    
+statsmodels            
+functions-framework==3.* 

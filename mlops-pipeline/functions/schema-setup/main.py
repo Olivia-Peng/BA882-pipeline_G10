@@ -1,12 +1,12 @@
 """
-Cloud Function to create BigQuery tables for model runs, metrics, and parameters in the `cdc_data` dataset.
-These tables will store information for each model, including metadata, metrics, and hyperparameters.
-The function checks if each table exists before creating it to prevent duplicate creation.
+Cloud Function to create BigQuery tables for model runs, metrics, parameters, and predictions in the `cdc_data` dataset.
+These tables will store information for each model, including metadata, metrics, hyperparameters, and predictions.
 
 Tables created:
 1. model_runs: Stores model metadata, including model_id, name, GCS path, model path, disease code, and timestamp.
 2. model_metrics: Stores model evaluation metrics such as MSE, MAE, with their values and model_id.
 3. model_parameters: Stores model hyperparameters used in training, along with model_id and parameter values.
+4. predictions: Stores weekly predictions made by the latest trained model, including model_id, inference_date, date, predicted occurrence, and disease code.
 
 BigQuery Dataset: cdc_data
 """
@@ -44,6 +44,13 @@ def create_schema(request):
             bigquery.SchemaField("model_id", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("parameter_name", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("parameter_value", "STRING", mode="NULLABLE")
+        ],
+        "predictions": [
+            bigquery.SchemaField("model_id", "STRING", mode="REQUIRED"),
+            bigquery.SchemaField("inference_date", "TIMESTAMP", mode="REQUIRED"),
+            bigquery.SchemaField("date", "DATE", mode="REQUIRED"),
+            bigquery.SchemaField("predicted_occurrence", "FLOAT", mode="REQUIRED"),
+            bigquery.SchemaField("Disease", "STRING", mode="REQUIRED")  # Added disease code field
         ]
     }
 
@@ -69,4 +76,6 @@ def create_schema(request):
             print(f"Table {table_name} created successfully.")
 
     return {"status": "Tables created or verified successfully."}, 200
+
+
 

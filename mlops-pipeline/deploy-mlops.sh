@@ -37,4 +37,38 @@ gcloud functions deploy mlops_create_schema \
     --timeout 600s
 
 
+echo "======================================================"
+echo "Deploying the SARIMA Model Training Function"
+echo "======================================================"
 
+gcloud functions deploy train_sarima_models \
+    --gen2 \
+    --runtime python311 \
+    --trigger-http \
+    --entry-point train_sarima_models \
+    --source ./functions/trainer \
+    --stage-bucket ba882-cloud-functions-stage \
+    --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --memory 2048MB \
+    --timeout 600s
+
+
+
+echo "======================================================"
+echo "Deploying the SARIMA Model Predictions Function"
+echo "======================================================"
+
+gcloud functions deploy predict_sarima_models \
+    --gen2 \
+    --runtime python311 \
+    --trigger-http \
+    --entry-point predict_with_latest_models \
+    --source ./functions/predictions \
+    --stage-bucket ba882-cloud-functions-stage \
+    --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --memory 2048MB \
+    --timeout 600s

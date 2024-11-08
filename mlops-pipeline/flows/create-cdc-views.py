@@ -24,15 +24,6 @@ def cdc_ml_datasets():
     # Execute the CDC occurrences view creation
     create_cdc_views()
 
-# Set up the deployment with an event trigger
+#Set up for local testing
 if __name__ == "__main__":
-    # Trigger the cdc_ml_datasets flow when the weekly-cdc-pipeline deployment completes
-    cdc_ml_datasets().deploy(
-        name="cdc-disease-ml-datasets",
-        triggers=[
-            DeploymentEventTrigger(
-                expect={"prefect.flow-run.Completed"},
-                match_related={"prefect.resource.name": "weekly-cdc-pipeline"}
-            )
-        ]
-    )
+    create_cdc_views()

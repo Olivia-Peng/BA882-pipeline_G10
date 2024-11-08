@@ -1,2 +1,2 @@
-functions-framework==3.3.0
-google-cloud-bigquery==3.11.4
+functions-framework
+google-cloud-bigquery
