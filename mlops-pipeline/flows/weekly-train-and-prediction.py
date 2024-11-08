@@ -46,7 +46,7 @@ def invoke_gcf(url: str, payload: dict):
 def ensure_schema():
     """Invoke the Cloud Function to create BigQuery tables if they don't exist."""
     logger = get_run_logger()
-    url = "https://your-create-schema-cloud-function-url"  # Replace with your actual URL
+    url = "https://mlops-create-schema-162771833878.us-central1.run.app"  
     logger.info("Invoking Cloud Function for schema creation: %s", url)
     try:
         resp = invoke_gcf(url, payload={})
@@ -56,11 +56,11 @@ def ensure_schema():
         logger.error("Schema creation failed: %s", e)
         raise
 
-@task(retries=2)
+@task(retries=1)
 def train_sarima_models():
     """Invoke the Cloud Function to train SARIMA models."""
     logger = get_run_logger()
-    url = "https://your-train-sarima-models-cloud-function-url"  # Replace with your actual URL
+    url = "https://train-sarima-models-162771833878.us-central1.run.app"  
     logger.info("Invoking Cloud Function for model training: %s", url)
     try:
         resp = invoke_gcf(url, payload={})
@@ -70,11 +70,11 @@ def train_sarima_models():
         logger.error("Model training failed: %s", e)
         raise
 
-@task(retries=2)
+@task(retries=1)
 def predict_sarima_models():
     """Invoke the Cloud Function to generate predictions using the latest SARIMA models."""
     logger = get_run_logger()
-    url = "https://your-predict-sarima-models-cloud-function-url"  # Replace with your actual URL
+    url = "https://predict-sarima-models-162771833878.us-central1.run.app"  
     logger.info("Invoking Cloud Function for prediction generation: %s", url)
     try:
         resp = invoke_gcf(url, payload={})
