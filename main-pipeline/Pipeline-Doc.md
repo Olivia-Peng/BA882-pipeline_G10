@@ -1,10 +1,10 @@
 ## Project Pipeline Overview
 
-The main pipeline for our project follows these steps:
+<span style='color:blue'>The main pipeline, now executing weekly,</span> follows these steps:
 
 1. **Extract .txt files with data on disease occurrences from the CDC website** and store these files in a Google Cloud Storage bucket.
-2. **Create the necessary schema for two BigQuery tables** if they do not already exist: one table to hold raw data and one for the stage and final table. The raw table is cleared with every pipeline iteration.
-3. **Parse and transform the extracted .txt data** into a DataFrame format and store it as a Parquet file in another Google Cloud Storage bucket.
+2. **<span style='color:blue'>Create the necessary schema for three BigQuery tables</span>**, including the `disease_dic` table that links disease codes with their names. if they do not already exist: one table to hold raw data and one for the stage and final table. The raw table is cleared with every pipeline iteration.
+3. **<span style='color:blue'>Parse and transform the extracted .txt data using disease codes rather than names</span> into a DataFrame format and store it as a Parquet file in another Google Cloud Storage bucket.
 4. **Load the transformed data into the raw BigQuery table**.
 5. **Compare the records in the raw table with the stage table**. If records do not exist in the stage table, they are inserted there, avoiding duplicates.
 
@@ -66,3 +66,24 @@ The flow of the pipeline is orchestrated using **Prefect**, ensuring that each s
   5. **Upsert to Stage Table**: Calls the `load_to_stage` function to upsert records from the raw table into the stage table.
 
 The flow uses retries for robustness in case of network or other operational issues. 
+
+### Changes from Phase 2
+
+1. **Scheduling Update**  
+   - Updated the main pipeline deployment in `scheduler/scheduler.py` to execute weekly instead of daily. The execution day is set to Sunday, as the CDC releases updated information each Saturday.
+
+2. **Data Storage Optimization**  
+   - Modified `/functions/transform/main.py` to store disease codes instead of disease names in both raw and stage BigQuery tables. This change addresses issues caused by inconsistent disease names in CDC's extracted `.txt` files.
+
+3. **Schema Expansion**  
+   - Added a third table, `disease_dic`, in BigQuery through `/functions/schema-setup/main.py`. This new table links disease codes with their corresponding disease names.
+
+4. **Dictionary Population Script**  
+   - Created a function in `deploy-scripts/populate-disease-dict.py` to populate the `disease_dic` table with the selected diseases for tracking.
+
+5. **Expanded Disease Tracking**  
+   - Increased the number of diseases tracked from four to ten to broaden our data monitoring.
+
+6. **Code-based Loading Adjustments**  
+   - Updated all load functions to use disease codes rather than names when loading data into BigQuery, ensuring consistency across tables.
+
