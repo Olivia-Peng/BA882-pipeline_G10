@@ -67,6 +67,8 @@ The flow of the pipeline is orchestrated using **Prefect**, ensuring that each s
 
 The flow uses retries for robustness in case of network or other operational issues. 
 
+---
+
 ### Changes from Phase 2
 
 1. **Scheduling Update**  
