@@ -1,10 +1,10 @@
 ## Project Pipeline Overview
 
-<span style='color:blue'>The main pipeline, now executing weekly,</span> follows these steps:
+The main pipeline, now executing weekly, follows these steps:
 
 1. **Extract .txt files with data on disease occurrences from the CDC website** and store these files in a Google Cloud Storage bucket.
-2. **<span style='color:blue'>Create the necessary schema for three BigQuery tables</span>**, including the `disease_dic` table that links disease codes with their names. if they do not already exist: one table to hold raw data and one for the stage and final table. The raw table is cleared with every pipeline iteration.
-3. **<span style='color:blue'>Parse and transform the extracted .txt data using disease codes rather than names</span> into a DataFrame format and store it as a Parquet file in another Google Cloud Storage bucket.
+2. **Create the necessary schema for three BigQuery tables**, including the `disease_dic` table that links disease codes with their names. if they do not already exist: one table to hold raw data and one for the stage and final table. The raw table is cleared with every pipeline iteration.
+3. **Parse and transform** the extracted .txt data using disease codes rather than names into a DataFrame format and store it as a Parquet file in another Google Cloud Storage bucket.
 4. **Load the transformed data into the raw BigQuery table**.
 5. **Compare the records in the raw table with the stage table**. If records do not exist in the stage table, they are inserted there, avoiding duplicates.
 
@@ -86,4 +86,5 @@ The flow uses retries for robustness in case of network or other operational iss
 
 6. **Code-based Loading Adjustments**  
    - Updated all load functions to use disease codes rather than names when loading data into BigQuery, ensuring consistency across tables.
+
 
