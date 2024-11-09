@@ -77,7 +77,7 @@ def train_sarima_models(request):
 
             # Generate unique model ID
             model_id = datetime.datetime.now().strftime("%Y%m%d%H%M") + "-" + str(uuid.uuid4())
-            last_training_date = pd.to_datetime(train_data.index[-1]).strftime("%Y-%m-%d")
+            last_training_date = df['Date'].max().strftime("%Y-%m-%d")
 
             # Save model and metadata to GCS
             model_gcs_path = f"{model_storage_path}/model_for_{disease_code}/{model_id}.joblib"
