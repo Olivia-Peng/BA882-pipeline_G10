@@ -2,8 +2,8 @@ from google.cloud import bigquery
 import functions_framework
 
 # BigQuery configurations
-project_id = "ba882-pipeline-olivia"
-dataset_id = "CDC"
+project_id = "ba882-group-10"
+dataset_id = "cdc_data"
 table_id = "symptom"
 
 # List of diseases and their predefined text for each section
