@@ -15,12 +15,12 @@ def create_bigquery_schema():
         symptom_schema = [
             bigquery.SchemaField("Disease", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("Overview", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("How it Spreads", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("Symptoms in Women", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("Symptoms in Men", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("Symptoms from Rectal Infections", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("How_it_Spreads", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("Symptoms_in_Women", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("Symptoms_in_Men", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("Symptoms_from_Rectal_Infections", "STRING", mode="NULLABLE"),
             bigquery.SchemaField("Prevention", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("Treatment and Recovery", "STRING", mode="NULLABLE")
+            bigquery.SchemaField("Treatment_and_Recovery", "STRING", mode="NULLABLE")
         ]
 
         # Set up symptom table information
