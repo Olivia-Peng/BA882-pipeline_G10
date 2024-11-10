@@ -213,7 +213,7 @@ predefined_data = {
             "Pets can also become infected. Valley fever does not spread from person to person or between people and animals."
         ),
         "How_it_Spreads": "N/A",
-        "Symptoms in Women": (
+        "Symptoms_in_Women": (
             "Some people who are exposed to the fungus never have symptoms. Other people may have symptoms that include: "
             "Fatigue (tiredness), Cough, Fever and headache, Shortness of breath, Night sweats, Muscle aches or joint pain, Rash on upper body or legs."
         ),
