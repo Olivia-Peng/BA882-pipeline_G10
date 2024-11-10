@@ -8,7 +8,7 @@ def create_bigquery_schema():
         client = bigquery.Client()
 
         # Define dataset and table information
-        dataset_id = "ba882-pipeline-olivia.CDC"
+        dataset_id = "ba882-group-10.cdc_data"
 
         # Define schema for the symptom table
         symptom_table_id = f"{dataset_id}.symptom"

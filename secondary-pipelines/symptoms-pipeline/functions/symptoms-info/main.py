@@ -2,8 +2,8 @@ from google.cloud import bigquery
 import functions_framework
 
 # BigQuery configurations
-project_id = "ba882-pipeline-olivia"
-dataset_id = "CDC"
+project_id = "ba882-group-10"
+dataset_id = "cdc_data"
 table_id = "symptom"
 
 # List of diseases and their predefined text for each section
@@ -33,7 +33,7 @@ predefined_data = {
             "You can get chlamydia by having vaginal, anal, or oral sex without a condom with someone who has the infection. "
             "A pregnant person with chlamydia can give the infection to their baby during childbirth."
         ),
-        "Symptoms_in _Women": (
+        "Symptoms_in_Women": (
             "Even when chlamydia has no symptoms, it can damage a woman's reproductive system. "
             "Women with symptoms may notice: An abnormal vaginal discharge, A burning sensation when peeing."
         ),
