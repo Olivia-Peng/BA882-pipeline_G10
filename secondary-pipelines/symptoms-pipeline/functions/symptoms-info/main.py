@@ -226,7 +226,7 @@ predefined_data = {
             "Fatigue (tiredness), Cough, Fever and headache, Shortness of breath, Night sweats, Muscle aches or joint pain, Rash on upper body or legs."
         ),
         "Prevention": "N/A",
-        "Treatment and Recovery": "N/A"
+        "Treatment_and_Recovery": "N/A"
     },
     "250": {
         "Overview": (
