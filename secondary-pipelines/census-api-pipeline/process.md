@@ -4,8 +4,9 @@ As part of Phase Two's effort, we wanted to provide a little more demographic da
 
 1. Map state names to state fips
 2. Retrieve racial and income data using state fips
-* The race data includes White, Black, Native American, Asian
-* Socioeconomic data includes income
+    * The race data includes White, Black, Native American, Asian
+    * Socioeconomic data includes income
 3. Create a schema and table if not exist
 4. Finally, insert the table into BigQuery
 
+Although the census data does not require frequent updates, as it only changes on an annual basis, our infrastructure allows us to automatically pull in changes if this project does go on past this calendar year. 
