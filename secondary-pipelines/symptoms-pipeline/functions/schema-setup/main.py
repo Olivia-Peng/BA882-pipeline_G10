@@ -8,19 +8,19 @@ def create_bigquery_schema():
         client = bigquery.Client()
 
         # Define dataset and table information
-        dataset_id = "ba882-group-10.cdc_data"
+        dataset_id = "ba882-pipeline-olivia.CDC"
 
         # Define schema for the symptom table
         symptom_table_id = f"{dataset_id}.symptom"
         symptom_schema = [
             bigquery.SchemaField("Disease", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("Overview", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("How it Spreads", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("Symptoms in Women", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("Symptoms in Men", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("Symptoms from Rectal Infections", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("How_it_Spreads", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("Symptoms_in_Women", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("Symptoms_in_Men", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("Symptoms_from_Rectal_Infections", "STRING", mode="NULLABLE"),
             bigquery.SchemaField("Prevention", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("Treatment and Recovery", "STRING", mode="NULLABLE")
+            bigquery.SchemaField("Treatment_and_Recovery", "STRING", mode="NULLABLE")
         ]
 
         # Set up symptom table information
