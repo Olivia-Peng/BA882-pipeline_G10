@@ -30,4 +30,4 @@ This workflow outlines setting up a BigQuery schema using a Google Cloud Functio
   - Inside `store_data_in_bigquery`, prepare `rows_to_insert` using the disease information from `predefined_data`, matching the fields in the BigQuery schema.
 
 **Summary**
-This workflow allows automated schema creation and data insertion into BigQuery for a symptom table. Each time run_scraping_to_bigquery is triggered, it verifies the table's existence, creates it if absent, and populates it with predefined data for various diseases.
+This workflow allows automated schema creation and data insertion into BigQuery for a symptom table. Each time `run_scraping_to_bigquery` is triggered, it verifies the table's existence, creates it if absent, and populates it with predefined data for various diseases.
