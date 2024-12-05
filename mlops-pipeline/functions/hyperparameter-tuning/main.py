@@ -10,7 +10,7 @@ from datetime import datetime
 import functions_framework
 import tempfile
 
-# Set up logging
+## Set up logging
 logging.basicConfig(level=logging.INFO)
 
 # Constants
