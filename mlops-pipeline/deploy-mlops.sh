@@ -72,3 +72,25 @@ gcloud functions deploy predict_sarima_models \
     --allow-unauthenticated \
     --memory 2048MB \
     --timeout 600s
+
+
+echo "======================================================"
+echo "Deploying the SARIMA Model Hyperparameter Tuning Function"
+echo "======================================================"
+
+gcloud functions deploy sarima_hyperparameter_tuning \
+    --gen2 \
+    --runtime python311 \
+    --trigger-http \
+    --entry-point sarima_hyperparameter_tuning \
+    --source ./functions/hyperparameter-tuning \
+    --stage-bucket ba882-cloud-functions-stage \
+    --service-account etl-pipeline@ba882-group-10.iam.gserviceaccount.com \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --memory 5120MB \
+    --timeout 750s
+
+echo "======================================================"
+echo "Deployment Complete"
+echo "======================================================"
