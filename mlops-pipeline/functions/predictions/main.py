@@ -113,9 +113,12 @@ def load_metadata_from_gcs(bucket_name, metadata_path):
 def log_predictions_to_bq(client, disease_code, model_id, future_dates, predictions):
     """Logs predictions to BigQuery predictions table with an additional Disease field."""
     table_id = f"{project_id}.{dataset_id}.predictions"
+    # Truncate inference_date to nearest hour
+    inference_date = datetime.datetime.now().replace(minute=0, second=0, microsecond=0).isoformat()
+    
     rows_to_insert = [{
         "model_id": model_id,
-        "inference_date": datetime.datetime.now().isoformat(),
+        "inference_date": inference_date,  # Use truncated timestamp
         "date": date.strftime('%Y-%m-%d'),
         "predicted_occurrence": prediction,
         "Disease": disease_code  # Add disease code as 'Disease' field
