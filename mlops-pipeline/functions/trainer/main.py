@@ -1,10 +1,14 @@
 """
 Cloud Function to train SARIMA models on CDC disease occurrences data.
-1. Loops through each disease code in the `training-data` folder on GCS.
-2. Retrieves data for each disease from GCS.
-3. Splits data into training and testing sets based on date.
-4. Fits a SARIMA model and evaluates it.
-5. Stores each model in GCS and logs metadata, metrics, and parameters to BigQuery.
+
+Updates:
+1. Retrieves the best hyperparameters for each disease code from GCS (`tunning_results/{disease_code}/{disease_code}_params.json`).
+2. Skips training for disease codes that do not have a corresponding best parameters JSON file.
+3. Trains a SARIMA model for each disease code using the retrieved best parameters.
+4. Splits the data into training and testing sets based on the date.
+5. Evaluates the trained SARIMA model using R2, MAE, and MSE metrics.
+6. Stores the trained SARIMA model and metadata in GCS.
+7. Logs metadata, metrics, and hyperparameters for each trained model into BigQuery.
 
 BigQuery Dataset: cdc_data
 GCS Bucket: ba882-group-10-mlops
@@ -18,8 +22,6 @@ import uuid
 import datetime
 import json
 import re
-import os
-
 from google.cloud import storage, bigquery
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -30,10 +32,7 @@ project_id = 'ba882-group-10'
 bucket_name = 'ba882-group-10-mlops'
 dataset_id = 'cdc_data'
 model_storage_path = 'pipeline'
-
-# Default SARIMA hyperparameters
-DEFAULT_ORDER = (2, 1, 2)
-DEFAULT_SEASONAL_ORDER = (1, 1, 1, 12)  # Monthly seasonality
+best_params_path = 'tunning_results'  # Path to JSON files with best parameters
 
 @functions_framework.http
 def train_sarima_models(request):
@@ -58,13 +57,21 @@ def train_sarima_models(request):
             df = pd.read_csv(csv_path, parse_dates=['Date'])
             df = df.sort_values(by="Date")
 
-            print(f"Columns in CSV: {df.columns}")
-            
+            # Load best parameters from GCS
+            best_params = get_best_params_from_gcs(bucket_name, disease_code)
+            if not best_params:
+                print(f"No best parameters found for disease code {disease_code}. Skipping...")
+                continue
+
             # Prepare the data
             train_data, test_data = split_train_test(df, 'Date', 'Total_Occurrences', test_months=3)
 
             # Train SARIMA model
-            sarima_model = SARIMAX(train_data, order=DEFAULT_ORDER, seasonal_order=DEFAULT_SEASONAL_ORDER)
+            sarima_model = SARIMAX(
+                train_data,
+                order=(best_params['p'], best_params['d'], best_params['q']),
+                seasonal_order=(best_params['P'], best_params['D'], best_params['Q'], best_params['s']),
+            )
             model_fit = sarima_model.fit(disp=False)
 
             # Generate predictions on the test set
@@ -86,7 +93,8 @@ def train_sarima_models(request):
 
             # Log metadata, metrics, and parameters to BigQuery
             log_model_metadata(bigquery_client, model_id, disease_code, model_gcs_path, r2, mae, mse)
-            log_model_parameters(bigquery_client, model_id, DEFAULT_ORDER, DEFAULT_SEASONAL_ORDER)
+            log_model_parameters(bigquery_client, model_id, (best_params['p'], best_params['d'], best_params['q']),
+                                 (best_params['P'], best_params['D'], best_params['Q'], best_params['s']))
 
             # Append result for this disease code
             results.append({
@@ -103,6 +111,21 @@ def train_sarima_models(request):
 
     return {"results": results}, 200
 
+def get_best_params_from_gcs(bucket_name, disease_code):
+    """Fetches the best parameters for a given disease code from GCS."""
+    storage_client = storage.Client()
+    file_path = f"{best_params_path}/{disease_code}/{disease_code}_params.json"
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(file_path)
+
+    if blob.exists():
+        params_json = blob.download_as_text()
+        best_params = json.loads(params_json).get('best_params')
+        return best_params
+    else:
+        print(f"Best parameters file not found for disease code {disease_code}.")
+        return None
+
 def split_train_test(df, date_column, target_column, test_months=3):
     """Splits a time series DataFrame into train and test sets."""
     latest_date = df[date_column].max()
@@ -113,30 +136,11 @@ def split_train_test(df, date_column, target_column, test_months=3):
     return train_data, test_data
 
 def save_model_and_metadata_to_gcs(model, bucket_name, model_path, metadata_path, last_training_date):
-    """
-    Saves the trained model and metadata to GCS.
-
-    The model is saved as a .joblib file, and an additional metadata JSON file is created
-    to store the `last_training_date`. This metadata file allows future prediction functions
-    to know the end date of the training data, ensuring predictions start from the correct date.
-    
-    Parameters:
-    - model: The trained SARIMA model.
-    - bucket_name: GCS bucket where the files will be stored.
-    - model_path: Path in GCS to save the model file.
-    - metadata_path: Path in GCS to save the metadata file.
-    - last_training_date: The last date in the training data, used to determine the prediction start date.
-    """
-    # Initialize GCSFileSystem for saving files to GCS
+    """Saves the trained model and metadata to GCS."""
     gcs = GCSFileSystem()
-    
-    # Save the model
     full_model_path = f"gs://{bucket_name}/{model_path}"
     with gcs.open(full_model_path, 'wb') as f:
         joblib.dump(model, f)
-    print(f"Model successfully uploaded to GCS at {full_model_path}")
-    
-    # Save metadata with last training date
     metadata = {
         "last_training_date": last_training_date,
         "model_id": model_path.split('/')[-1].replace(".joblib", ""),
@@ -145,7 +149,6 @@ def save_model_and_metadata_to_gcs(model, bucket_name, model_path, metadata_path
     full_metadata_path = f"gs://{bucket_name}/{metadata_path}"
     with gcs.open(full_metadata_path, 'w') as f:
         json.dump(metadata, f)
-    print(f"Metadata successfully uploaded to GCS at {full_metadata_path}")
 
 def log_model_metadata(client, model_id, disease_code, model_path, r2, mae, mse):
     """Logs model metadata and metrics to BigQuery."""
@@ -156,11 +159,9 @@ def log_model_metadata(client, model_id, disease_code, model_path, r2, mae, mse)
         "gcs_path": f"gs://{bucket_name}/{model_storage_path}",
         "model_path": f"gs://{bucket_name}/{model_path}",
         "disease_code": disease_code,
-        "created_at": datetime.datetime.now().isoformat()  # Convert to ISO format for JSON
+        "created_at": datetime.datetime.now().isoformat()
     }]
     client.insert_rows_json(table_id, rows_to_insert)
-
-    # Log metrics
     metrics_table_id = f"{project_id}.{dataset_id}.model_metrics"
     metrics = [
         {"model_id": model_id, "metric_name": "r2", "metric_value": r2},
@@ -177,6 +178,7 @@ def log_model_parameters(client, model_id, order, seasonal_order):
         {"model_id": model_id, "parameter_name": "seasonal_order", "parameter_value": str(seasonal_order)}
     ]
     client.insert_rows_json(parameters_table_id, parameters)
+
 
 
 
