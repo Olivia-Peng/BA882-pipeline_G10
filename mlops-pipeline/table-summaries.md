@@ -56,6 +56,3 @@ This document provides an overview of the BigQuery tables used in the MLOps pipe
 - `predicted_occurrence`: A `FLOAT` indicating the predicted value.
 - `disease_code`: The `STRING` value of the disease code for the prediction.
 
----
-
-This structured layout ensures clarity and accessibility, providing a detailed reference for each table and its role in the pipeline.
